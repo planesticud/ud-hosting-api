@@ -1,0 +1,27 @@
+version: '3'
+networks:
+ dev_planestic:
+
+services:
+  ud-hosting-api:
+     build: .
+     container_name: ud-hosting-api
+     restart: on-failure
+     env_file:
+        - .env
+     volumes:
+        - "$PWD/files:/usr/src/app/files"
+     networks:
+        - dev_planestic
+     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ud-hosting-api.rule=Host(`desarrollo.planestic.udistrital.edu.co`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.ud-hosting-api.middlewares=ud-hosting-api-stripprefix"
+      - "traefik.http.middlewares.ud-hosting-api-stripprefix.stripprefix.prefixes=/api"
+      - "traefik.http.routers.ud-hosting-api.tls=true"
+      - "traefik.http.routers.ud-hosting-api.tls.certresolver=le"
+      - "traefik.http.services.ud-hosting-api.loadbalancer.server.port=3000"  
+          
+networks:
+  dev_planestic:
+    external: true
